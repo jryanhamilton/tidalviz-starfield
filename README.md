@@ -46,7 +46,8 @@ brightest spot.
 | File | What it is |
 | --- | --- |
 | `src/common.glsl` | Shared by both shaders: noise, and the flying stars (one star per grid cell, four depth layers over static dust) |
-| `src/scene.frag` | Starfield's procedural nebula: domain-warped gas, rim light, wisps and dark dust |
+| `src/nebula.frag` | Starfield's procedural nebula, drawn at half resolution: domain-warped gas, rim light, wisps and dark dust |
+| `src/scene.frag` | Starfield's final pass: the stars at full resolution over the half-resolution nebula |
 | `src/image.frag` | Picture visualizers: the whole picture, churned by slow noise, with a bass-driven swell and bloom |
 | `src/image-map.glsl` | Where the picture sits on screen, both ways, so the star sprites follow its churn and swell |
 | `src/sprites.vert`, `src/sprites.frag` | A glow sprite on each painted star (instanced) |

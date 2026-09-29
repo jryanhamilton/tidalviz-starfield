@@ -23,6 +23,7 @@ const UNIFORMS = /** @type {const} */ ([
   "u_treb", "u_bands", "u_density", "u_shimmer", "u_flares", "u_nebula", "u_size", "u_core",
   "u_gas", "u_rim", "u_image", "u_imageSize", "u_zoom", "u_fill", "u_pulse", "u_coreUv", "u_corePulse",
   "u_beatTime", "u_twinkleClock", "u_twinkle", "u_twinkleSync", "u_intensity", "u_dynamics",
+  "u_prepass",
 ]);
 
 /** @typedef {Record<(typeof UNIFORMS)[number], WebGLUniformLocation | null>} Locations */
@@ -37,12 +38,14 @@ const STAR_FLOATS = 7;
 
 /**
  * @param {import('../tidalviz').VisualizerContext} ctx
- * @param {{ fragment: string, image?: string, sprites?: { vertex: string, fragment: string } }} opts
- *   the picture's fragment shader; optionally a backdrop image, and sprite shaders to light up the
- *   stars found in it. All repo-relative.
+ * @param {{ fragment: string, image?: string, sprites?: { vertex: string, fragment: string },
+ *   prepass?: { fragment: string, scale: number } }} opts the picture's fragment shader;
+ *   optionally a backdrop image, sprite shaders to light up the stars found in it, and a shader
+ *   drawn first at `scale` × the screen size into a texture the picture reads as `u_prepass`
+ *   (for soft, costly layers). All repo-relative.
  * @returns {Promise<import('../tidalviz').Visualizer>}
  */
-export async function createStarfield(ctx, { fragment, image, sprites }) {
+export async function createStarfield(ctx, { fragment, image, sprites, prepass }) {
   const gl = /** @type {WebGL2RenderingContext} */ (ctx.gl);
   /** @param {string} path */
   const shader = async (path) => {
@@ -52,6 +55,12 @@ export async function createStarfield(ctx, { fragment, image, sprites }) {
   const program = link(gl, VERTEX, "vertex shader", await shader(fragment), fragment);
   const u = locate(gl, program);
   const vao = gl.createVertexArray();
+  /** @type {{ program: WebGLProgram, u: Locations, target: ReturnType<typeof createTarget>, scale: number } | null} */
+  let pre = null;
+  if (prepass) {
+    const pp = link(gl, VERTEX, "vertex shader", await shader(prepass.fragment), prepass.fragment);
+    pre = { program: pp, u: locate(gl, pp), target: createTarget(gl), scale: prepass.scale };
+  }
 
   /** @type {WebGLTexture | null} */
   let texture = null;
@@ -166,12 +175,32 @@ export async function createStarfield(ctx, { fragment, image, sprites }) {
       flare = flash.step(motion.flare, time.dt, ctx.reduceFlashing);
       corePulse = pulseFlash.step(motion.pulse, time.dt, ctx.reduceFlashing);
 
+      gl.bindVertexArray(vao);
+      if (pre) {
+        // The pre-pass at its own (smaller) size; the target only reallocates when that changes.
+        const t = pre.target;
+        const w = Math.max(1, Math.round(ctx.size.width * pre.scale));
+        const h = Math.max(1, Math.round(ctx.size.height * pre.scale));
+        if (t.width !== w || t.height !== h) t.resize(w, h);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, t.fbo);
+        gl.viewport(0, 0, w, h);
+        gl.useProgram(pre.program);
+        setUniforms(pre.u, audio, time);
+        gl.uniform2f(pre.u.u_resolution, w, h);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+      }
+
       gl.viewport(0, 0, ctx.size.width, ctx.size.height);
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(program);
-      gl.bindVertexArray(vao);
       setUniforms(u, audio, time);
+      if (pre) {
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, pre.target.tex);
+        gl.uniform1i(u.u_prepass, 1);
+      }
       gl.drawArrays(gl.TRIANGLES, 0, 3);
 
       if (starPass) {
@@ -195,6 +224,10 @@ export async function createStarfield(ctx, { fragment, image, sprites }) {
       gl.deleteProgram(program);
       gl.deleteVertexArray(vao);
       if (texture) gl.deleteTexture(texture);
+      if (pre) {
+        gl.deleteProgram(pre.program);
+        pre.target.dispose();
+      }
       if (starPass) {
         gl.deleteProgram(starPass.program);
         gl.deleteVertexArray(starPass.vao);
@@ -227,6 +260,47 @@ function detectStars(bitmap) {
   const big = findStars(coarse.data, coarse.w, coarse.h, { max: 60, radius: 6, threshold: 0.12, spread: 0.6 });
   const small = findStars(fine.data, fine.w, fine.h, { max: 400 });
   return mergeStars(big, small, 0.02, bitmap.width / bitmap.height, 400);
+}
+
+/**
+ * A colour texture + framebuffer for an offscreen pass: RGBA16F when the GPU can render to it,
+ * else RGBA8 (fine for the nebula, which is stored tone-mapped, 0–1).
+ * @param {WebGL2RenderingContext} gl
+ */
+function createTarget(gl) {
+  const float = Boolean(gl.getExtension("EXT_color_buffer_float"));
+  const tex = /** @type {WebGLTexture} */ (gl.createTexture());
+  const fbo = /** @type {WebGLFramebuffer} */ (gl.createFramebuffer());
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  for (const [k, v] of /** @type {const} */ ([
+    [gl.TEXTURE_MIN_FILTER, gl.LINEAR],
+    [gl.TEXTURE_MAG_FILTER, gl.LINEAR],
+    [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE],
+    [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE],
+  ])) {
+    gl.texParameteri(gl.TEXTURE_2D, k, v);
+  }
+  return {
+    tex,
+    fbo,
+    width: 0,
+    height: 0,
+    /** (Re)allocate storage. @param {number} w @param {number} h */
+    resize(w, h) {
+      this.width = w;
+      this.height = h;
+      gl.bindTexture(gl.TEXTURE_2D, tex);
+      if (float) gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA16F, w, h, 0, gl.RGBA, gl.HALF_FLOAT, null);
+      else gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+      gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+      gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    },
+    dispose() {
+      gl.deleteTexture(tex);
+      gl.deleteFramebuffer(fbo);
+    },
+  };
 }
 
 /**

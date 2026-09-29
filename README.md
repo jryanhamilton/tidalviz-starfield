@@ -106,6 +106,6 @@ Reduce flashing on at the most intense settings.
 ## License
 
 [MIT](LICENSE). `tidalviz.d.ts` and `src/flash.js` come from
-[Cosmic Peanut](https://github.com/cbuchert/cosmic-peanut) under its MIT License (notice included
-in `LICENSE`). The pictures are Greg Martin's and are not covered: see
+[Cosmic Peanut](https://github.com/cbuchert/cosmic-peanut) under its MIT License (notice in
+[`THIRD_PARTY_NOTICES`](THIRD_PARTY_NOTICES)). The pictures are Greg Martin's and are not covered: see
 [Credits and pictures](#credits-and-pictures).

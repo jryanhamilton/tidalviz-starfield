@@ -1,6 +1,6 @@
 // @ts-check
 /**
- * Copied from Cosmic Peanut (plugins/template/src/flash.js), © 2026 Chris Buchert, MIT: see LICENSE.
+ * Copied from Cosmic Peanut (plugins/template/src/flash.js), © 2026 Chris Buchert, MIT: see THIRD_PARTY_NOTICES.
  *
  * Photosensitivity guard for full-screen brightness.
  *

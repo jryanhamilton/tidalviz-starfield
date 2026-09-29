@@ -1,6 +1,6 @@
 /**
  * Tidalviz visualizer plugin API, version 1.
- * Copied from Cosmic Peanut (web/sdk/tidalviz.d.ts), © 2026 Chris Buchert, MIT: see LICENSE.
+ * Copied from Cosmic Peanut (web/sdk/tidalviz.d.ts), © 2026 Chris Buchert, MIT: see THIRD_PARTY_NOTICES.
  *
  * A plugin's entry module default-exports a {@link CreateVisualizer} factory. The SDK owns the
  * canvas, the rendering context, sizing and the animation loop; the plugin only draws.

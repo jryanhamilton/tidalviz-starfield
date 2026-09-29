@@ -1,6 +1,10 @@
-MIT License
+Third-party notices for tidalviz-starfield
+==========================================
 
-Copyright (c) 2026 jryanhamilton
+tidalviz.d.ts and src/flash.js are copied from Cosmic Peanut
+(https://github.com/cbuchert/cosmic-peanut) under its MIT License:
+
+Copyright (c) 2026 Chris Buchert
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +23,8 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+------------------------------------------
+
+The pictures used by the aogm-imagine-* visualizers are Greg Martin's and are
+not part of this repository or covered by any license in it. See README.md.

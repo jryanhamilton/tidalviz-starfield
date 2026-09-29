@@ -32,18 +32,30 @@ Midjourney and Photoshop). All rights to the pictures are his. He provides these
 "freely for your personal use and enjoyment", so they are **not included in this repo**: download
 your own copies from his page.
 
-1. Open [Nebulae III](https://www.artofgregmartin.com/imagine/nebulae-iii) and download its three
-   wallpapers (3440 × 1440).
-2. Save them in this repo's `local/` folder under these names, in the order they appear on the page:
+Each visualizer loads its picture by an exact file name, `local/<visualizer id>.jpg`. Those names
+belong to this plugin, not to the artist: the files you download from his site have arbitrary names
+(e.g. `iD9hDiZqVZk5A5N5Pg6HXmcT8.jpg`), so save or rename each one as below. The pictures are shown
+in this order on his [Nebulae III](https://www.artofgregmartin.com/imagine/nebulae-iii) page.
 
-   | Page order | Save as |
-   | --- | --- |
-   | 1st: teal, a glowing gap between dark cloud banks | `local/aogm-imagine-nebula-3a.jpg` |
-   | 2nd: violet and red, around a blue-white glow | `local/aogm-imagine-nebula-3b.jpg` |
-   | 3rd: a glowing blue cavity in a bowl of gas | `local/aogm-imagine-nebula-3c.jpg` |
+| # on his page | Picture | Direct link (3440 × 1440 JPEG) | Save as |
+| --- | --- | --- | --- |
+| 1 | Teal: a glowing gap between dark cloud banks | [iD9hDiZqVZk5A5N5Pg6HXmcT8.jpg](https://framerusercontent.com/images/iD9hDiZqVZk5A5N5Pg6HXmcT8.jpg) | `local/aogm-imagine-nebula-3a.jpg` |
+| 2 | Violet and red, around a blue-white glow | [7NM6Qo0eShgZ4dn6i8aX7RDo.jpg](https://framerusercontent.com/images/7NM6Qo0eShgZ4dn6i8aX7RDo.jpg) | `local/aogm-imagine-nebula-3b.jpg` |
+| 3 | A glowing blue cavity in a bowl of gas | [otlJrVj1vdOC6u97AB4wF0rTE.jpg](https://framerusercontent.com/images/otlJrVj1vdOC6u97AB4wF0rTE.jpg) | `local/aogm-imagine-nebula-3c.jpg` |
 
-   Another format (AVIF, PNG) converts on a Mac with
-   `sips -s format jpeg <file> --out local/<name>.jpg`.
+Or download all three with the right names, from this repo's folder:
+
+```sh
+mkdir -p local
+curl -fL -o local/aogm-imagine-nebula-3a.jpg https://framerusercontent.com/images/iD9hDiZqVZk5A5N5Pg6HXmcT8.jpg
+curl -fL -o local/aogm-imagine-nebula-3b.jpg https://framerusercontent.com/images/7NM6Qo0eShgZ4dn6i8aX7RDo.jpg
+curl -fL -o local/aogm-imagine-nebula-3c.jpg https://framerusercontent.com/images/otlJrVj1vdOC6u97AB4wF0rTE.jpg
+```
+
+The direct links point at the files his site serves today; if one stops working, download from his
+[Nebulae III](https://www.artofgregmartin.com/imagine/nebulae-iii) page and match by the order and
+description above. A picture saved in another format (AVIF, PNG) converts on a Mac with
+`sips -s format jpeg <file> --out local/<name>.jpg`.
 
 Until a picture is in place its visualizer shows "No backdrop image" with the path it expects.
 

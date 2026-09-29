@@ -1,0 +1,4 @@
+# Pictures for the aogm-imagine-* visualizers: download your own (see README), never commit them.
+local/
+node_modules/
+.DS_Store

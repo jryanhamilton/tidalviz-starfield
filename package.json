@@ -1,0 +1,14 @@
+{
+  "name": "tidalviz-starfield",
+  "private": true,
+  "type": "module",
+  "description": "Dev-time tooling only. The visualizers are plain ES modules and shaders that Tidalviz loads as-is.",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vitest": "5.0.2"
+  }
+}

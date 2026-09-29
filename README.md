@@ -1,6 +1,8 @@
-# Starfield
+# Starfield for Tidalviz
 
-Visualizers of a nebula whose stars play along with the music:
+Visualizer plugins for **Tidalviz**, the macOS music visualizer from Chris Buchert's
+[Cosmic Peanut](https://github.com/cbuchert/cosmic-peanut) project: nebulae whose stars play along
+with the music.
 
 - **Starfield**: the nebula is procedural, a bowl of gas lit from within by a glowing core, and
   you fly through procedural stars.
@@ -14,6 +16,14 @@ Visualizers of a nebula whose stars play along with the music:
   count; at two scales so big glowing stars count too), and each gets a glow sprite that shimmers
   with its own frequency band and flares on beats, in place.
 
+## Install
+
+- **Starfield only:** in Tidalviz, **Library → Add URL** and paste this repo's URL. Tidalviz clones
+  it and keeps it updated. The picture visualizers are listed too, but an installed copy has no
+  pictures, so they show "No backdrop image".
+- **With the pictures:** clone this repo, add the pictures to its `local/` folder (below), then in
+  Tidalviz use **Library → Add folder** and pick the clone. Pull to update.
+
 ## Credits and pictures
 
 The three picture visualizers are built on **_Nebulae III_ by Greg Martin**, from his /Imagine
@@ -24,7 +34,7 @@ your own copies from his page.
 
 1. Open [Nebulae III](https://www.artofgregmartin.com/imagine/nebulae-iii) and download its three
    wallpapers (3440 × 1440).
-2. Save them in `plugins/starfield/local/` under these names, in the order they appear on the page:
+2. Save them in this repo's `local/` folder under these names, in the order they appear on the page:
 
    | Page order | Save as |
    | --- | --- |
@@ -33,7 +43,7 @@ your own copies from his page.
    | 3rd: a glowing blue cavity in a bowl of gas | `local/aogm-imagine-nebula-3c.jpg` |
 
    Another format (AVIF, PNG) converts on a Mac with
-   `sips -s format jpeg <file> --out plugins/starfield/local/<name>.jpg`.
+   `sips -s format jpeg <file> --out local/<name>.jpg`.
 
 Until a picture is in place its visualizer shows "No backdrop image" with the path it expects.
 
@@ -75,9 +85,20 @@ brightest spot.
 
 Core pulses and flares are rate-limited by "Reduce flashing" (at most 3 new rises a second).
 
-## Running
+## Development
 
-Run with hot reload: `uv run tidalviz --dev plugins/starfield`. Or without the app:
-`python3 -m http.server 8765 --bind 127.0.0.1` from the repo root, then open
-`http://127.0.0.1:8765/plugins/_harness/index.html?repo=starfield&viz=starfield&audio=music`
-(or e.g. `viz=aogm-imagine-nebula-3a`).
+Run with hot reload from a Tidalviz checkout: `uv run tidalviz --dev <path to this repo>`. Saving
+a file reloads the visualizer; `tidalviz.d.ts` is a copy of Tidalviz's plugin API types.
+
+Tests and type checks use Node as a dev-time tool only (the visualizers themselves have no build
+step):
+
+```sh
+npm ci
+npm test            # vitest: star detection, audio timing, #include
+npm run typecheck   # tsc --checkJs, strict
+```
+
+Measured in Tidalviz's plugin harness at 2560×1440 on an M1 Max (GPU included): Starfield ~2.25
+ms per frame, the picture visualizers ~1.8 ms. The 10 Hz strobe photosensitivity check passes with
+Reduce flashing on at the most intense settings.

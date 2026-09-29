@@ -1,5 +1,7 @@
 // @ts-check
 /**
+ * Copied from Cosmic Peanut (plugins/template/src/flash.js), © 2026 Chris Buchert, MIT: see LICENSE.
+ *
  * Photosensitivity guard for full-screen brightness.
  *
  * A flash is a rise in brightness followed by a fall. The limiter lets its output fall freely but

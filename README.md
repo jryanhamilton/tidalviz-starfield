@@ -102,3 +102,10 @@ npm run typecheck   # tsc --checkJs, strict
 Measured in Tidalviz's plugin harness at 2560×1440 on an M1 Max (GPU included): Starfield ~2.25
 ms per frame, the picture visualizers ~1.8 ms. The 10 Hz strobe photosensitivity check passes with
 Reduce flashing on at the most intense settings.
+
+## License
+
+[MIT](LICENSE). `tidalviz.d.ts` and `src/flash.js` come from
+[Cosmic Peanut](https://github.com/cbuchert/cosmic-peanut) under its MIT License (notice included
+in `LICENSE`). The pictures are Greg Martin's and are not covered: see
+[Credits and pictures](#credits-and-pictures).
